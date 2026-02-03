@@ -1,0 +1,77 @@
+###################
+# STAGE 1: Build
+###################
+FROM php:8.3-fpm-alpine AS builder
+
+# Install build dependencies
+RUN apk add --no-cache \
+    zip \
+    unzip \
+    git \
+    && docker-php-ext-install pdo pdo_mysql bcmath opcache
+
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+WORKDIR /var/www/html
+
+# Copy composer files first for better caching
+COPY composer.json composer.lock ./
+
+# Install PHP dependencies (including dev for building)
+RUN composer install --no-scripts --no-autoloader --prefer-dist
+
+# Copy application code
+COPY . .
+
+# Finish composer install and optimize (production, no dev dependencies)
+RUN composer install --no-dev --optimize-autoloader
+
+# Cache routes and views (but NOT config - that uses runtime env vars)
+RUN php artisan route:cache \
+    && php artisan view:cache
+
+
+###################
+# STAGE 2: Production
+###################
+FROM php:8.3-fpm-alpine AS production
+
+# Install only runtime dependencies (no build tools)
+RUN apk add --no-cache \
+    nginx \
+    supervisor \
+    && docker-php-ext-install pdo pdo_mysql bcmath opcache
+
+WORKDIR /var/www/html
+
+# Copy only what we need from builder stage
+COPY --from=builder /var/www/html/vendor ./vendor
+COPY --from=builder /var/www/html/bootstrap ./bootstrap
+COPY --from=builder /var/www/html/public ./public
+COPY --from=builder /var/www/html/routes ./routes
+COPY --from=builder /var/www/html/config ./config
+COPY --from=builder /var/www/html/app ./app
+COPY --from=builder /var/www/html/resources ./resources
+COPY --from=builder /var/www/html/storage ./storage
+COPY --from=builder /var/www/html/database ./database
+COPY --from=builder /var/www/html/artisan ./artisan
+COPY --from=builder /var/www/html/composer.json ./composer.json
+
+# Copy nginx and supervisor config
+COPY docker/nginx.conf /etc/nginx/http.d/default.conf
+COPY docker/supervisord.conf /etc/supervisord.conf
+
+# Set up non-root user
+RUN chown -R www-data:www-data \
+    /var/www/html/storage \
+    /var/www/html/bootstrap/cache \
+    /run \
+    /var/lib/nginx \
+    /var/log/nginx
+
+USER www-data
+
+EXPOSE 8080
+
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]

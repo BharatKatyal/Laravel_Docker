@@ -53,6 +53,6 @@ USER www-data
 
 
 
-EXPOSE 80
+EXPOSE 8080
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]

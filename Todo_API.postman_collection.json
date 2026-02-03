@@ -1,0 +1,132 @@
+{
+  "info": {
+    "name": "Todo API",
+    "description": "Laravel Todo API CRUD operations",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "12345"
+  },
+  "item": [
+    {
+      "name": "Get All Todos",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/todos",
+          "host": ["{{base_url}}"],
+          "path": ["api", "todos"]
+        },
+        "description": "Retrieve a list of all todos"
+      },
+      "response": []
+    },
+    {
+      "name": "Get Single Todo",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/todos/1",
+          "host": ["{{base_url}}"],
+          "path": ["api", "todos", "1"]
+        },
+        "description": "Retrieve a specific todo by ID"
+      },
+      "response": []
+    },
+    {
+      "name": "Create Todo",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Buy groceries\",\n  \"description\": \"Milk, eggs, bread\",\n  \"completed\": false\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/todos",
+          "host": ["{{base_url}}"],
+          "path": ["api", "todos"]
+        },
+        "description": "Create a new todo item"
+      },
+      "response": []
+    },
+    {
+      "name": "Update Todo",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Updated title\",\n  \"description\": \"Updated description\",\n  \"completed\": true\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/todos/1",
+          "host": ["{{base_url}}"],
+          "path": ["api", "todos", "1"]
+        },
+        "description": "Update an existing todo item"
+      },
+      "response": []
+    },
+    {
+      "name": "Mark Todo as Complete",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"completed\": true\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/todos/1",
+          "host": ["{{base_url}}"],
+          "path": ["api", "todos", "1"]
+        },
+        "description": "Mark a todo as completed"
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Todo",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/todos/1",
+          "host": ["{{base_url}}"],
+          "path": ["api", "todos", "1"]
+        },
+        "description": "Delete a todo item"
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    }
+  ]
+}
+
